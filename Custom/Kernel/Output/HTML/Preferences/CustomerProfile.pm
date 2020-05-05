@@ -29,8 +29,6 @@ sub new {
 sub Param {
     my ( $Self, %Param ) = @_;
 
-    # check if we need to show password change option
-
     # define AuthModule for frontend
     my $AuthModule = $Self->{ConfigItem}->{Area} eq 'Agent'
         ? 'AuthModule'
