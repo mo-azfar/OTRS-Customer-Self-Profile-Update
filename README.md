@@ -14,11 +14,10 @@
         (+) next GROUP if $Group eq 'CustomerProfile';  
     
     
-        if ( $Group eq 'Password' ) {  
+        (-) if ( $Group eq 'Password' ) {  
+        (+) if ( $Group eq 'Password' || $Group eq 'CustomerProfile' ) {  
             next PRIO;  
-        }  
-        (+) if ( $Group eq 'CustomerProfile' ) {  
-        (+) 	next PRIO;  
-        (+) }  
-    
+        }   
+          
+          
 [![profile.png](https://i.postimg.cc/MHw2bjsD/profile.png)](https://postimg.cc/LYxbmhFY)
