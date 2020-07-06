@@ -47,9 +47,32 @@ sub Param {
     # return on no pw reset backends
     return if $Module =~ /(LDAP|HTTPBasicAuth|Radius)/i;
 	
+	#search for field in the customer database structure. Useful for dropdown selection. In this case, get the dropdown of customer Title/Salutation
+	my @SeachFields = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserSearchFields(
+        Source => 'CustomerUser', # optional, but important in the CustomerSearchDetail to get the right database fields
+    );
+	
+	my $CU_Title;
+	foreach my $title_values (@SeachFields)
+	{
+		next if $title_values->{DatabaseField} ne 'title';
+		$CU_Title = $title_values->{SelectionsData};
+		last if $title_values->{DatabaseField} eq 'title';
+	}
+	
     my @Params;
     push(
         @Params,
+		{
+            %Param,
+            Key   => Translatable('Title'),
+            Name  => 'Title',
+            Raw   => 1,
+			#Input for text field, Option for dropdown
+            Data       => \%{$CU_Title},
+			Block => 'Option',
+			SelectedID => $Param{UserData}->{UserTitle},
+        },
         {
             %Param,
             Key   => Translatable('First Name'),
@@ -88,6 +111,11 @@ sub Run {
 	my $ConfigObject   = $Kernel::OM->Get('Kernel::Config');
     my $LanguageObject = $Kernel::OM->Get('Kernel::Language');
 	
+	my $Title;
+    if ( $Param{GetParam}->{Title} && $Param{GetParam}->{Title}->[0] ) {
+        $Title = $Param{GetParam}->{Title}->[0];
+    }
+	
 	my $FN;
     if ( $Param{GetParam}->{FN} && $Param{GetParam}->{FN}->[0] ) {
         $FN = $Param{GetParam}->{FN}->[0];
@@ -116,6 +144,7 @@ sub Run {
         ID            => $Param{UserData}->{UserLogin},            # current user login
         UserLogin     => $Param{UserData}->{UserLogin},       # new user login
 		UserCustomerID => $Param{UserData}->{UserCustomerID},
+		UserTitle => $Title,
 		UserFirstname => $FN,
         UserLastname  => $LN,
 		UserMobile	=> $Mobile,
